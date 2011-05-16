@@ -68,8 +68,6 @@ class XmppHandler(xmpp_handlers.CommandHandler):
             message_content=message_content, json=message.body, 
             timestamp=timestamp)
         msg.put()
-        
-        message.reply('thanks!')
 
 application = webapp.WSGIApplication([
         ('/_ah/xmpp/message/chat/', XmppHandler)
