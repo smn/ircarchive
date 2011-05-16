@@ -1,4 +1,5 @@
 from google.appengine.ext import db
+from datetime import datetime
 
 def key(*args):
     return db.Key.from_path(*args).id_or_name()
