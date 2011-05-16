@@ -1,11 +1,33 @@
+from google.appengine.ext import db
 from google.appengine.ext.webapp import xmpp_handlers
 from models import User, Channel, Message
 from django.utils import simplejson as json
 from utils import parse_timestamp, get_or_create
 from datetime import datetime
+import logging
+
+"""
+Sample json received via XMPP:
+
+{
+    "nickname": "sdehaan",
+    "server": "irc.freenode.net",
+    "channel": "#vumi",
+    "message_type": "message",
+    "message_content": "testing app engine",
+    "timestamp": "2011-05-16T08:17:53.749184"
+}
+
+"""
 
 class XmppHandler(xmpp_handlers.CommandHandler):
     def text_message(self, message=None):
+        im_from = db.IM("xmpp", message.sender)
+        
+        # only accept from XMPP messages from our domain
+        if '@praekeltfoundation.org/' not in im_from.address:
+            return
+        
         payload = json.loads(message.body)
         
         # get the payload data
