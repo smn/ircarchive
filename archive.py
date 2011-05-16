@@ -13,3 +13,8 @@ class ArchiveHandler(webapp.RequestHandler):
         prefetch_refprops(messages, Message.user)
         path = os.path.join(os.path.dirname(__file__), 'index.html')
         self.response.out.write(template.render(path, locals()))
+    
+    def post(self):
+        msg = Message.log(self.request.body)
+        self.response.set_status(201)
+        self.response.out.write(msg.key())

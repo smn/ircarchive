@@ -1,9 +1,6 @@
 from google.appengine.ext import db
 from google.appengine.ext.webapp import xmpp_handlers
-from models import User, Channel, Message
-from django.utils import simplejson as json
-from utils import parse_timestamp, get_or_create
-from datetime import datetime
+from models import Message
 import logging
 
 """
@@ -25,29 +22,9 @@ class XmppHandler(xmpp_handlers.CommandHandler):
         im_from = db.IM("xmpp", message.sender)
         
         # only accept from XMPP messages from our domain
-        if '@praekeltfoundation.org/' not in im_from.address:
+        if '@praekeltfoundation.org' not in im_from.address:
             logging.info("Rejecting %s from %s" % (message.body, im_from.address))
             return
         
-        logging.info('Received JSON: %s' % message.body)
-        payload = json.loads(message.body)
-        
-        # get the payload data
-        nickname = payload.get('nickname')
-        server = payload.get('server', 'unknown')
-        channel = payload.get('channel')
-        message_type = payload.get('message_type')
-        message_content = payload.get('message_content')
-        timestamp = parse_timestamp(payload.get('timestamp'))
-        
-        user = get_or_create(User, server=server, nickname=nickname)
-        user.last_seen_at = datetime.utcnow()
-        user.put()
-        
-        channel = get_or_create(Channel, server=server, channel=channel)
-        # store the message
-        msg = Message(user=user, channel=channel, message_type=message_type,
-            message_content=message_content, json=message.body, 
-            timestamp=timestamp)
-        msg.put()
-        logging.info('Wrote %s' % msg)
+        msg = Message.log(message.body)
+        logging.info('Wrote %s %s' % ("Message", msg.key()))
