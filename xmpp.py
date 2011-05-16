@@ -26,8 +26,10 @@ class XmppHandler(xmpp_handlers.CommandHandler):
         
         # only accept from XMPP messages from our domain
         if '@praekeltfoundation.org/' not in im_from.address:
+            logging.info("Rejecting %s from %s" % (message.body, im_from.address))
             return
         
+        logging.info('Received JSON: %s' % message.body)
         payload = json.loads(message.body)
         
         # get the payload data
@@ -48,3 +50,4 @@ class XmppHandler(xmpp_handlers.CommandHandler):
             message_content=message_content, json=message.body, 
             timestamp=timestamp)
         msg.put()
+        logging.info('Wrote %s' % msg)
