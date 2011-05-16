@@ -15,4 +15,4 @@ indexes:
   - name: user
   - name: channel
   - name: timestamp
-    order: desc
+    direction: desc
