@@ -1,0 +1,17 @@
+indexes:
+    
+- kind: User
+  properties:
+  - name: server
+  - name: nickname
+ 
+- kind: Channel
+  properties:
+  - name: server
+  - name: channel
+ 
+- kind: Message
+  properties:
+  - name: user
+  - name: channel
+  - name: timestamp

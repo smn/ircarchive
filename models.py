@@ -5,15 +5,17 @@ def key(*args):
     return db.Key.from_path(*args)
 
 class User(db.Model):
+    server = db.StringProperty(required=True)
     nickname = db.StringProperty(required=True)
     created_at = db.DateTimeProperty(required, auto_now_add=True)
     last_seen_at = db.DateTimeProperty(required)
     
     @staticmethod
-    def find_by_nickname(nickname):
-        user = User.get(key(User.kind(), nickname))
+    def find_by_nickname(server, nickname):
+        user = User.get(key(User.kind(), server, nickname))
         if user is None:
             user = User()
+            user.server = server
             user.nickname = nickname
             user.last_seen_at = datetime.now()
             user.put()

@@ -21,7 +21,7 @@ class XmppHandler(xmpp_handlers.CommandHandler):
         
         # store the message
         msg = Message()
-        msg.user = User.find_by_username(username)
+        msg.user = User.find_by_username(server, username)
         msg.channel = Channel.find_channel(server, channel)
         msg.message_type = message_type
         msg.message_content = message_content
