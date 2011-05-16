@@ -22,8 +22,6 @@ sample json:
 
 """
 
-TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
-
 def key(*args):
     return db.Key.from_path(*args)
 
@@ -38,6 +36,16 @@ def get_or_create(model, **kwargs):
         return entity
     return db.run_in_transaction(txn)
 
+def parse_timestamp(timestamp):
+    FORMAT = '%Y-%m-%dT%H:%M:%S'
+    if '.' in timestamp:
+        nofrag, frag = timestamp.split('.')
+        nofrag_dt = datetime.strptime(nofrag, FORMAT)
+        dt = nofrag_dt.replace(microsecond=int(frag))
+        return dt
+    else:
+        return datetime.strptime(timestamp, FORMAT)
+
 class XmppHandler(xmpp_handlers.CommandHandler):
     def text_message(self, message=None):
         payload = json.loads(message.body)
@@ -48,7 +56,7 @@ class XmppHandler(xmpp_handlers.CommandHandler):
         channel = payload.get('channel')
         message_type = payload.get('message_type')
         message_content = payload.get('message_content')
-        timestamp = datetime.strptime(payload.get('timestamp'), TIMESTAMP_FORMAT)
+        timestamp = parse_timestamp(payload.get('timestamp'))
         
         user = get_or_create(User, server=server, nickname=nickname)
         user.last_seen_at = datetime.utcnow()
