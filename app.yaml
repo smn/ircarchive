@@ -8,7 +8,7 @@ builtins:
 
 handlers:
 - url: /.*
-  script: ircarchive.py
+  script: main.py
 
 inbound_services:
 - xmpp_message
