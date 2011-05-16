@@ -37,6 +37,7 @@
         <p><a href="http://github.com/smn/ircarchive/" title="IRC Archive">Fork on GitHub</a> if you want to help improve.</p>
         <table>
             <tr>
+                <th>Channel</th>
                 <th>Time</th>
                 <th>User</th>
                 <th>Message</th>
@@ -44,6 +45,7 @@
             {% for message in messages %}
                 {% ifequal message.message_type 'message' %}
                 <tr class="{% cycle even,odd %}">
+                    <th>{{message.channel.channel|default:""}}</th>
                     <td>{{message.timestamp|timesince}} ago</td>
                     <td>{{message.user.nickname}}</td>
                     <td>{{ message.message_content|escape }}</td>
@@ -52,6 +54,7 @@
                 
                 {% ifequal message.message_type 'action'  %}
                 <tr class="action">
+                    <th>{{message.channel.channel|default:""}}</th>
                     <td>{{message.timestamp|timesince}} ago</td>
                     <td></td>
                     <td>{{ message.message_content|escape }}</td>
@@ -60,6 +63,7 @@
 
                 {% ifequal message.message_type 'system'  %}
                 <tr class="system">
+                    <th>{{message.channel.channel|default:""}}</th>
                     <td>{{message.timestamp|timesince}} ago</td>
                     <td></td>
                     <td>{{ message.message_content|escape }}</td>
