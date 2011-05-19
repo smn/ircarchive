@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block body %}
+    <p>The last 1000 messages in {{channel_names|join:", "}}</p>
+    <p><a href="http://github.com/smn/ircarchive/" title="IRC Archive">Fork on GitHub</a> if you want to help improve.</p>
+    {% include "templates/messages" %}
+{% endblock %}
