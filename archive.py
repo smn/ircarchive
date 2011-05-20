@@ -13,10 +13,8 @@ def render(template_file, context):
 
 class ArchiveHandler(webapp.RequestHandler):
     def get(self):
-        channel_names = [channel.channel for channel in Channel.all()
-                            if channel.channel.startswith('#')]
-        messages = Message.all().order('-timestamp').fetch(1000)
-        prefetch_refprops(messages, Message.user)
+        channels = [channel for channel in Channel.all() 
+                        if channel.channel.startswith('#')]
         self.response.out.write(render('templates/index.html', locals()))
     
     def post(self):
@@ -28,8 +26,6 @@ class ChannelHandler(webapp.RequestHandler):
     def get(self, server, channel):
         key = db.Key.from_path(Channel.kind(), '%s/%s' % (unquote(channel), server))
         channel = Channel.get(key)
-        messages = Message.gql("WHERE channel = :channel", channel)
-        logging.debug(channel)
-        logging.debug(messages)
+        messages = Message.all().filter('channel =', channel).order('-timestamp')
         self.response.out.write(render('templates/channel.html', locals()))
         

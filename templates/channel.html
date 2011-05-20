@@ -1,6 +1,43 @@
 {% extends "base.html" %}
 {% block body %}
-    <p>The last 1000 messages in {{channel.channel}}</p>
-    <p><a href="http://github.com/smn/ircarchive/" title="IRC Archive">Fork on GitHub</a> if you want to help improve.</p>
-    {% include "templates/messages" %}
+    <p>
+        <a href="/">All channels</a> /
+        <b>{{channel.channel}} on {{channel.server}}</b>
+    </p>
+    <table>
+        <tr>
+            <th>Channel</th>
+            <th>Time</th>
+            <th>User</th>
+            <th>Message</th>
+        </tr>
+        {% for message in messages %}
+            {% ifequal message.message_type 'message' %}
+            <tr class="{% cycle even,odd %}">
+                <th>{{message.channel.channel|default:""}}</th>
+                <td>{{message.timestamp|timesince}} ago</td>
+                <td>{{message.user.nickname}}</td>
+                <td>{{ message.message_content|escape }}</td>
+            </tr>
+            {% endifequal %}
+        
+            {% ifequal message.message_type 'action'  %}
+            <tr class="action">
+                <th>{{message.channel.channel|default:""}}</th>
+                <td>{{message.timestamp|timesince}} ago</td>
+                <td></td>
+                <td>{{ message.message_content|escape }}</td>
+            </tr>
+            {% endifequal %}
+
+            {% ifequal message.message_type 'system'  %}
+            <tr class="system">
+                <th>{{message.channel.channel|default:""}}</th>
+                <td>{{message.timestamp|timesince}} ago</td>
+                <td></td>
+                <td>{{ message.message_content|escape }}</td>
+            </tr>
+            {% endifequal %}
+        {% endfor %}
+    </table>
 {% endblock %}

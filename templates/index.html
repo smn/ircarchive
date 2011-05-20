@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block body %}
-    <p>The last 1000 messages in {{channel_names|join:", "}}</p>
-    <p><a href="http://github.com/smn/ircarchive/" title="IRC Archive">Fork on GitHub</a> if you want to help improve.</p>
-    {% include "templates/messages" %}
+    <p>IRC channels being tracked by <a href="http://twitter.com/vumiapp">@vumiapp</a></p>
+    <ul>
+    {% for channel in channels %}
+        <li><a href="/channel/{{channel.server}}/{{ channel.channel|urlencode }}/">{{ channel.channel }}</a> on {{ channel.server }}</li>
+    {% endfor %}
+    </ul>
 {% endblock %}
