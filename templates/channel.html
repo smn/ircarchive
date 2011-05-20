@@ -12,25 +12,25 @@
             {% for message in messages %}
                 {% ifequal message.message_type 'message' %}
                 <tr class="{% cycle even,odd %}">
-                    <td>{{message.timestamp|timesince}} ago</td>
+                    <td id="{{message.timestamp|date:"YmdHis"}}">{{message.timestamp|timesince}} ago</td>
                     <td class="white" style="background-color: rgb({{message.user.get_color|join:","}})">{{message.user.nickname}}</td>
-                    <td>{{ message.message_content|escape }}</td>
+                    <td>{{ message.message_content|escape|urlize }}</td>
                 </tr>
                 {% endifequal %}
         
                 {% ifequal message.message_type 'action'  %}
                 <tr class="action">
-                    <td>{{message.timestamp|timesince}} ago</td>
+                    <td id="{{message.timestamp|date:"YmdHis"}}">{{message.timestamp|timesince}} ago</td>
                     <td></td>
-                    <td>{{ message.message_content|escape }}</td>
+                    <td>{{ message.message_content|escape|urlize }}</td>
                 </tr>
                 {% endifequal %}
 
                 {% ifequal message.message_type 'system'  %}
                 <tr class="system">
-                    <td>{{message.timestamp|timesince}} ago</td>
+                    <td id="{{message.timestamp|date:"YmdHis"}}">{{message.timestamp|timesince}} ago</td>
                     <td></td>
-                    <td>{{ message.message_content|escape }}</td>
+                    <td>{{ message.message_content|escape|urlize }}</td>
                 </tr>
                 {% endifequal %}
             {% endfor %}
