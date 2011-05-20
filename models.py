@@ -4,12 +4,20 @@ from datetime import datetime
 import logging
 
 from utils import parse_timestamp, get_or_create
+import color
 
 class User(db.Model):
     server = db.StringProperty(required=True)
     nickname = db.StringProperty(required=True)
     created_at = db.DateTimeProperty(required=True, auto_now_add=True)
     last_seen_at = db.DateTimeProperty(required=False)
+    color = db.ListProperty(int, required=True, default=[])
+    
+    def get_color(self):
+        if not self.color:
+            self.color = color.random()
+            self.put()
+        return self.color
     
 class Channel(db.Model):
     channel = db.StringProperty(required=True)

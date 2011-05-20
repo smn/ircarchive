@@ -27,3 +27,4 @@ def prefetch_refprops(entities, *props):
     for (entity, prop), ref_key in zip(fields, ref_keys):
         prop.__set__(entity, ref_entities[ref_key])
     return entities
+

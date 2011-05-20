@@ -37,13 +37,10 @@ class ChannelHandler(webapp.RequestHandler):
                     .filter('timestamp >= ', start_date) \
                     .filter('timestamp < ', end_date) \
                     .order('-timestamp')
-        
         # date based pagination
         next_day = start_date + timedelta(days=1)
         if next_day > datetime.utcnow().date():
             next_day = None
         previous_day = end_date - timedelta(days=2)
-        logging.debug('next_day %s' % next_day)
-        logging.debug('previous_day %s' % previous_day)
         self.response.out.write(render('templates/channel.html', locals()))
         
