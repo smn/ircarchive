@@ -1,9 +1,7 @@
 {% extends "base.html" %}
 {% block body %}
-    <p>
-        <a href="/">All channels</a> /
-        <b>{{channel.channel}} on {{channel.server}}</b>
-    </p>
+    <h1>{{channel.channel}} on {{channel.server}}</h1>
+    <a href="/">&larr; all channels</a>
     <table>
         <tr>
             <th>Channel</th>
@@ -11,33 +9,53 @@
             <th>User</th>
             <th>Message</th>
         </tr>
-        {% for message in messages %}
-            {% ifequal message.message_type 'message' %}
-            <tr class="{% cycle even,odd %}">
-                <th>{{message.channel.channel|default:""}}</th>
-                <td>{{message.timestamp|timesince}} ago</td>
-                <td>{{message.user.nickname}}</td>
-                <td>{{ message.message_content|escape }}</td>
-            </tr>
-            {% endifequal %}
+        {% if messages.count %}
+            {% for message in messages %}
+                {% ifequal message.message_type 'message' %}
+                <tr class="{% cycle even,odd %}">
+                    <th>{{message.channel.channel|default:""}}</th>
+                    <td>{{message.timestamp|timesince}} ago</td>
+                    <td>{{message.user.nickname}}</td>
+                    <td>{{ message.message_content|escape }}</td>
+                </tr>
+                {% endifequal %}
         
-            {% ifequal message.message_type 'action'  %}
-            <tr class="action">
-                <th>{{message.channel.channel|default:""}}</th>
-                <td>{{message.timestamp|timesince}} ago</td>
-                <td></td>
-                <td>{{ message.message_content|escape }}</td>
-            </tr>
-            {% endifequal %}
+                {% ifequal message.message_type 'action'  %}
+                <tr class="action">
+                    <th>{{message.channel.channel|default:""}}</th>
+                    <td>{{message.timestamp|timesince}} ago</td>
+                    <td></td>
+                    <td>{{ message.message_content|escape }}</td>
+                </tr>
+                {% endifequal %}
 
-            {% ifequal message.message_type 'system'  %}
-            <tr class="system">
-                <th>{{message.channel.channel|default:""}}</th>
-                <td>{{message.timestamp|timesince}} ago</td>
-                <td></td>
-                <td>{{ message.message_content|escape }}</td>
+                {% ifequal message.message_type 'system'  %}
+                <tr class="system">
+                    <th>{{message.channel.channel|default:""}}</th>
+                    <td>{{message.timestamp|timesince}} ago</td>
+                    <td></td>
+                    <td>{{ message.message_content|escape }}</td>
+                </tr>
+                {% endifequal %}
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="4">No messages were posted today</td>
             </tr>
-            {% endifequal %}
-        {% endfor %}
+        {% endif %}
+        <tr>
+            <td colspan="4">
+                {% if next_day %}
+                    <div class="next">
+                        <a href="?date={{next_day|date:"Y-m-d"}}">{{next_day}} &rarr;</a>
+                    </div>
+                {% endif %}
+                {% if previous_day %}
+                    <div class="previous">
+                        <a href="?date={{previous_day|date:"Y-m-d"}}">&larr; {{previous_day}}</a>
+                    </div>
+                {% endif %}
+            </td>
+        </tr>
     </table>
 {% endblock %}
