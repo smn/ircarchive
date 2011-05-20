@@ -14,4 +14,9 @@ indexes:
   properties:
   - name: channel
   - name: timestamp
+
+- kind: Message
+  properties:
+  - name: channel
+  - name: timestamp
     direction: desc

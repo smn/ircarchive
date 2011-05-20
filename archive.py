@@ -14,7 +14,7 @@ def render(template_file, context):
 
 class ArchiveHandler(webapp.RequestHandler):
     def get(self):
-        channels = [channel for channel in Channel.all() 
+        channels = [channel for channel in Channel.all().order('channel') 
                         if channel.channel.startswith('#')]
         self.response.out.write(render('templates/index.html', locals()))
     
@@ -36,7 +36,7 @@ class ChannelHandler(webapp.RequestHandler):
         messages = Message.all().filter('channel =', channel) \
                     .filter('timestamp >= ', start_date) \
                     .filter('timestamp < ', end_date) \
-                    .order('-timestamp')
+                    .order('timestamp')
         # date based pagination
         next_day = start_date + timedelta(days=1)
         if next_day > datetime.utcnow().date():
