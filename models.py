@@ -1,6 +1,7 @@
 from django.utils import simplejson as json
 from google.appengine.ext import db
 from datetime import datetime
+from urllib2 import unquote
 import logging
 
 from utils import parse_timestamp, get_or_create
@@ -23,6 +24,11 @@ class Channel(db.Model):
     channel = db.StringProperty(required=True)
     server = db.StringProperty(required=True)
     topic = db.TextProperty()
+    
+    @staticmethod
+    def find(server, channel):
+        key = db.Key.from_path(Channel.kind(), '%s/%s' % (unquote(channel), server))
+        return Channel.get(key)
     
 
 class Message(db.Model):
