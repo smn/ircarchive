@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% block body %}
     <h1>{{channel.channel}} on {{channel.server}}</h1>
-    <a href="/">&larr; all channels</a>
+    <a href="/">&larr; back to all channels</a>
+    &middot;
+    <a href="#latest">&darr; Latest messages at the bottom</a>
     <table>
         <tr>
             <th>Time</th>
@@ -40,7 +42,7 @@
             </tr>
         {% endif %}
         <tr>
-            <td colspan="3">
+            <td colspan="3" id="latest">
                 {% if next_day %}
                     <div class="next">
                         <a href="?date={{next_day|date:"Y-m-d"}}">{{next_day}} &rarr;</a>
