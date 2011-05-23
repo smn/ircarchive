@@ -21,3 +21,8 @@ handlers:
 
 inbound_services:
 - xmpp_message
+
+skip_files:
+- ^bulkloader.*$
+- ^\..*$
+- ^\.pyc
