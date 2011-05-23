@@ -6,12 +6,11 @@ from models import Message, Channel
 from utils import prefetch_refprops, key
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from paging import PagedQuery
+from pager import PagerQuery
 import os, logging
 from datetime import datetime, timedelta
 
-def get_date(input):
-    if input:
-        return datetime.strptime(input, '%Y-%m-%d').date()
+PAGE_SIZE=10
 
 class BaseHandler(webapp.RequestHandler):
     
@@ -38,14 +37,15 @@ class ChannelHandler(BaseHandler):
     def get(self, server, channel):
         channel = Channel.find(server, channel)
         # get the page for pagination, expect to start at zero
-        query = Message.all().filter('channel =', channel) \
-                                    .order('timestamp')
-        paginator = PagedQuery(query, 500)
-        this_page_no = int(self.request.GET.get('p', 1))
-        next_page_no = this_page_no + 1
-        prev_page_no = this_page_no - 1
-        messages = paginator.fetch_page(this_page_no)
-        has_next_page = paginator.has_page(next_page_no)
-        has_prev_page = paginator.has_page(prev_page_no)
+        base = Message.all().filter('channel =', channel) \
+                                    .order('-timestamp')
+        messages = base.fetch(PAGE_SIZE + 1)
+        next = None
+        bookmark = self.request.GET.get('bookmark')
+        
+        if bookmark:
+            messages = base.filter('timestamp > ', bookmark)
+        
+        
         self.render_to_response('templates/channel.html', locals())
         

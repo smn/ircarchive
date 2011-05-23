@@ -43,14 +43,14 @@
         {% endif %}
         <tr>
             <td colspan="3" id="latest">
-                {% if has_next_page %}
+                {% if next %}
                     <div class="next">
-                        <a href="?p={{ next_page_no }}">Next &rarr;</a>
+                        <a href="?p={{ next }}">Next &rarr;</a>
                     </div>
                 {% endif %}
-                {% if has_prev_page %}
+                {% if prev %}
                     <div class="previous">
-                        <a href="?p={{ prev_page_no }}">&larr; Previous</a>
+                        <a href="?p={{ prev }}">&larr; Previous</a>
                     </div>
                 {% endif %}
             </td>
