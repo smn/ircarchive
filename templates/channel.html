@@ -3,7 +3,7 @@
     <h1>{{channel.channel}} on {{channel.server}}</h1>
     <a href="/">&larr; back to all channels</a>
     &middot;
-    <a href="#latest">&darr; Latest messages at the bottom</a>
+    <a href="#older">&darr; Oldest messages at the bottom</a>
     <table>
         <tr>
             <th>Time</th>
@@ -12,6 +12,11 @@
         </tr>
         {% if messages %}
             {% for message in messages %}
+                {% ifchanged %}
+                <tr>
+                    <th colspan="3" class="date">{{ message.timestamp|date:"YmdHis" }}</th>
+                </tr>
+                {% endifchanged %}
                 {% ifequal message.message_type 'message' %}
                 <tr class="{% cycle even,odd %}">
                     <td id="{{message.timestamp|date:"YmdHis"}}">{{message.timestamp|timesince}} ago</td>
@@ -36,24 +41,24 @@
                 </tr>
                 {% endifequal %}
             {% endfor %}
+            <tr>
+                <td colspan="3" id="oldest">
+                    {% if next %}
+                        <div class="next">
+                            <a href="?c={{ next }}">Next &rarr;</a>
+                        </div>
+                    {% endif %}
+                    {% if previous %}
+                        <div class="previous">
+                            <a href="?c={{ previous }}">&larr; Previous</a>
+                        </div>
+                    {% endif %}
+                </td>
+            </tr>
         {% else %}
             <tr>
                 <td colspan="3">No messages were posted today</td>
             </tr>
         {% endif %}
-        <tr>
-            <td colspan="3" id="latest">
-                {% if next %}
-                    <div class="next">
-                        <a href="?p={{ next }}">Next &rarr;</a>
-                    </div>
-                {% endif %}
-                {% if prev %}
-                    <div class="previous">
-                        <a href="?p={{ prev }}">&larr; Previous</a>
-                    </div>
-                {% endif %}
-            </td>
-        </tr>
     </table>
 {% endblock %}
