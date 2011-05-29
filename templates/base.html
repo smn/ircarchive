@@ -16,6 +16,10 @@
                 font-family: Helvetica, sans-serif;
             }
             
+            table {
+                border-spacing: 0;
+            }
+            
             th.date {
                 font-size: small;
                 font-weight: bold;
@@ -34,7 +38,12 @@
                 padding: 10px;
             }
             
-            td.white {
+            td.timestamp {
+                width: 15%;
+            }
+            
+            td.nickname {
+                width: 15%;
                 color: white;
             }
             
@@ -42,9 +51,15 @@
                 background-color: #E6E6E6;
             }
             
-            tr.action {
-                background-color: #0080FF;
-                color: #191919;
+            tr.action div {
+                background-color: #88A9FF;
+                color: #3D4D79;
+                text-align: center;
+                font-weight: bold;
+                font-size: small;
+                -moz-border-radius: 5px;
+                border-radius: 5px;
+                padding: 5px;
             }
             
             tr.system {

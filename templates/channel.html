@@ -14,22 +14,24 @@
             {% for message in messages %}
                 {% ifchanged %}
                 <tr>
-                    <th colspan="3" class="date">{{ message.timestamp|date:"YmdHis" }}</th>
+                    <th colspan="3" class="date">{{ message.timestamp|date:"l, F jS" }}</th>
                 </tr>
                 {% endifchanged %}
                 {% ifequal message.message_type 'message' %}
                 <tr class="{% cycle even,odd %}">
-                    <td id="{{message.timestamp|date:"YmdHis"}}">{{message.timestamp|timesince}} ago</td>
-                    <td class="white" style="background-color: rgb({{message.user.get_color|join:","}})">{{message.user.nickname}}</td>
-                    <td>{{ message.message_content|escape|urlize }}</td>
+                    <td class="timestamp" id="{{message.timestamp|date:"YmdHis"}}">{{message.timestamp|timesince}} ago</td>
+                    <td class="nickname" style="background-color: rgb({{message.user.get_color|join:","}})">{{message.user.nickname}}</td>
+                    <td class="message">{{ message.message_content|escape|urlize }}</td>
                 </tr>
                 {% endifequal %}
         
                 {% ifequal message.message_type 'action'  %}
                 <tr class="action">
-                    <td id="{{message.timestamp|date:"YmdHis"}}">{{message.timestamp|timesince}} ago</td>
-                    <td></td>
-                    <td>{{ message.message_content|escape|urlize }}</td>
+                    <td id="{{message.timestamp|date:"YmdHis"}}" colspan="3">
+                        <div>
+                            {{ message.message_content|escape|urlize }} at {{message.timestamp|date:"H:i:s"}}
+                        </div>
+                    </td>
                 </tr>
                 {% endifequal %}
 
