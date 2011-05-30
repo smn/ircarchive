@@ -8,7 +8,7 @@ from django.core.paginator import Paginator, EmptyPage, InvalidPage
 import os, logging
 from datetime import datetime, timedelta
 
-PAGE_SIZE=200
+PAGE_SIZE=20
 DATE_FORMAT = '%Y%m%d%H%M%S'
 
 class BaseHandler(webapp.RequestHandler):
@@ -37,19 +37,16 @@ class ChannelHandler(BaseHandler):
         channel = Channel.find(server, channel)
         query = Message.all().filter('channel =', channel) \
                                         .order('-timestamp')
-        last_cursor = self.request.GET.get('c')
-        if last_cursor:
-            query.with_cursor(last_cursor)
-        
-        try:
-            previous = query.cursor()
-        except AssertionError:
-            # we're at the start
-            previous = None
+        cursor = self.request.GET.get('c')
+        if cursor:
+            query.with_cursor(cursor)
+            previous = memcache.get(cursor) or ''
         
         today = datetime.utcnow().date()
         messages = query.fetch(PAGE_SIZE)
         next = query.cursor()
+        if cursor:
+            memcache.set(next, cursor)
         # optimization
         prefetch_refprops(messages, Message.user)
         self.render_to_response('templates/channel.html', locals())
