@@ -3,7 +3,7 @@
     <h1>{{channel.channel}} on {{channel.server}}</h1>
     <a href="/">&larr; back to all channels</a>
     &middot;
-    <a href="#older">&darr; Oldest messages at the bottom</a>
+    <a href="#oldest">&darr; Oldest messages at the bottom</a>
     <table>
         <tr>
             <th>Time</th>
@@ -19,8 +19,14 @@
                 {% endifchanged %}
                 {% ifequal message.message_type 'message' %}
                 <tr class="{% cycle even,odd %}">
-                    <td class="timestamp" id="{{message.timestamp|date:"YmdHis"}}">{{message.timestamp|timesince}} ago</td>
-                    <td class="nickname" style="background-color: rgb({{message.user.get_color|join:","}})">{{message.user.nickname}}</td>
+                    <td class="timestamp" id="{{message.timestamp|date:"YmdHis"}}">
+                        {% if message.timestamp.date == today %}
+                            {{message.timestamp|timesince}} ago
+                        {% else %}
+                            {{message.timestamp|date:"H:i"}}
+                        {% endif %}
+                    </td>
+                    <td class="nickname" style="background-color: rgb({{message.user.get_color|join:","}})" title="Last seen on {{message.user.last_seen_at|date:"l, F jS \a\t H:i"}}">{{message.user.nickname}}</td>
                     <td class="message">{{ message.message_content|escape|urlize }}</td>
                 </tr>
                 {% endifequal %}
@@ -29,7 +35,7 @@
                 <tr class="action">
                     <td id="{{message.timestamp|date:"YmdHis"}}" colspan="3">
                         <div>
-                            {{ message.message_content|escape|urlize }} at {{message.timestamp|date:"H:i:s"}}
+                            {{ message.message_content|escape|urlize }} at {{message.timestamp|date:"H:i"}}
                         </div>
                     </td>
                 </tr>
@@ -37,7 +43,13 @@
 
                 {% ifequal message.message_type 'system'  %}
                 <tr class="system">
-                    <td id="{{message.timestamp|date:"YmdHis"}}">{{message.timestamp|timesince}} ago</td>
+                    <td id="{{message.timestamp|date:"YmdHis"}}">
+                        {% if message.timestamp.date == today %}
+                            {{message.timestamp|timesince}} ago
+                        {% else %}
+                            {{message.timestamp|date:"H:i"}}
+                        {% endif %}
+                    </td>
                     <td></td>
                     <td>{{ message.message_content|escape|urlize }}</td>
                 </tr>

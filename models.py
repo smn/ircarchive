@@ -4,7 +4,7 @@ from datetime import datetime
 from urllib2 import unquote
 import logging
 
-from utils import parse_timestamp, get_or_create
+from utils import parse_timestamp, get_or_create, prefetch_refprops
 import color
 
 class User(db.Model):
