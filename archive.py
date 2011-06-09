@@ -31,6 +31,18 @@ class ArchiveHandler(BaseHandler):
         self.response.set_status(201)
         self.response.out.write(msg.key())
 
+class LogSweepHandler(BaseHandler):
+    def get(self):
+        messages = Message.all().filter('timestamp < ', datetime.utcnow() - timedelta(weeks=4))
+        logging.info('Deleting: %s' % messages.count())
+        db.delete(messages)
+        channels = Channel.all()
+        for channel in channel:
+            messages = Message.all().filter('channel = ', channel)
+            if messages.get():
+                logging.info('Deleting channel: %s' % channel)
+                db.delete(channel)
+
 class ChannelHandler(BaseHandler):
     
     def get(self, server, channel):

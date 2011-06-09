@@ -1,0 +1,4 @@
+cron:
+    - description: log sweeper
+      url: /tasks/log/sweeper
+      schedule: every 30 minutes
