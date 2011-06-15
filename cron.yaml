@@ -2,3 +2,6 @@ cron:
     - description: log sweeper
       url: /tasks/log/sweeper/
       schedule: every 12 hours
+    - description: bot flagger
+      url: /tasks/bot/flagger/
+      schedule: every 12 hours

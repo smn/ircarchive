@@ -4,10 +4,11 @@ use_library('django', '1.2')
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
-from archive import LogSweepHandler
+from archive import LogSweepHandler, BotFlaggingHandler
 
 application = webapp.WSGIApplication([
         ('/tasks/log/sweeper/', LogSweepHandler),
+        ('/tasks/bot/flagger/', BotFlaggingHandler)
     ], debug=True)
 
 def main():

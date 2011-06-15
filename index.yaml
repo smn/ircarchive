@@ -46,3 +46,10 @@ indexes:
   - name: user
   - name: timestamp
     direction: desc
+
+- kind: Message
+  properties:
+  - name: channel
+  - name: user_is_human
+  - name: timestamp
+    direction: desc

@@ -1,23 +1,19 @@
 {% extends "base.html" %}
 {% block body %}
     <h1>{{channel.channel}} on {{channel.server}}</h1>
-    <a href="/">&larr; back to all channels</a>
-    &middot;
-    <a href="#oldest">&darr; Oldest messages at the bottom</a>
-    <div>
-        <form action="" method="get" accept-charset="utf-8">
-            <strong>Hide messages tagged:</strong>
-            {% for tag in all_tags %}
-            <dl>
-                <dt>
-                    <input type="checkbox" name="hide_tag" value="{{tag.name}}" id="tag_{{tag.name}}">
-                    <label for="tag_{{tag.name}}">{{tag.name}}</label>
-                </dt>
-            </dl>
-            {% endfor %}
-            <input type="submit" name="" value="Hide" id="">
-        </form>
-    </div>
+    <form action="" method="get" accept-charset="utf-8">
+        <a href="/">&larr; back to all channels</a>
+        &middot;
+        <a href="#oldest">&darr; Oldest messages at the bottom</a>
+        &middot;
+        {% if hide_bots %}
+            <input type="hidden" name="hide_bots" value="0" id="hide_bots">
+            <input type="submit" name="" value="Show bots" id="">
+        {% else %}
+            <input type="hidden" name="hide_bots" value="1" id="hide_bots">
+            <input type="submit" name="" value="Hide bots" id="">
+        {% endif %}
+    </form>
     <table>
         <tr>
             <th>Time</th>

@@ -2,7 +2,7 @@ from google.appengine.ext import db
 from google.appengine.ext.webapp import template
 from google.appengine.ext import webapp
 from google.appengine.api import memcache
-from models import Message, Channel, User, Tag
+from models import Message, Channel, User
 from utils import prefetch_refprops, key
 import os, logging, json
 from datetime import datetime, timedelta
@@ -42,15 +42,31 @@ class LogSweepHandler(BaseHandler):
                 self.response.out.write('Deleting channel: %s <br/>' % channel.channel)
                 db.delete(channel)
 
-class TagHandler(BaseHandler):
+class BotFlaggingHandler(BaseHandler):
+    """If a user's been active on ircarchive but is now flagged as being
+    a bot then go back into history and mark their messages as such"""
+    def get(self):
+        bots = User.all().filter('is_human = ', False)
+        logging.info(bots)
+        for bot in bots:
+            messages = Message.all().filter('user = ',bot)\
+                            .filter('user_is_human = ', True).fetch(1000)
+            logging.info(messages)
+            for message in messages:
+                message.user_is_human = False
+            db.put(messages)
+            
+        
+
+class BotHandler(BaseHandler):
     def post(self):
         payload = json.loads(self.request.body)
         nickname = payload.get('nickname')
         server = payload.get('server')
-        tags = Tag.get_or_create(*payload.get('tags', []))
+        is_human = payload.get('is_human')
         user = User.find(server, nickname)
         if user:
-            user.tags = [tag.key() for tag in tags]
+            user.is_human = bool(is_human)
             user.save()
     
 
@@ -58,19 +74,15 @@ class ChannelHandler(BaseHandler):
     
     def get(self, server, channel):
         channel = Channel.find(server, channel)
-        
-        all_tags = Tag.all()
-        hide_tag_names = self.request.get_all('hide_tag')
-        hide_tags = [tag for tag in all_tags if tag.name in hide_tag_names]
+        hide_bots = self.request.GET.get('hide_bots', '1') == '1'
         
         query = Message.all().filter('channel =', channel)
-        if hide_tags:
-            for selected_tag in selected_tags:
-                query = query.filter('tags != ', selected_tag)
         
-        query = query.order('-timestamp')
+        if hide_bots:
+            query = query.filter('user_is_human = ', True)
         
-        # hide_keys = list(hide_keys)
+        quer = query.order('-timestamp')
+        
         cursor = self.request.GET.get('c')
         if cursor:
             query.with_cursor(cursor)
