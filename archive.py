@@ -2,10 +2,10 @@ from google.appengine.ext import db
 from google.appengine.ext.webapp import template
 from google.appengine.ext import webapp
 from google.appengine.api import memcache
-from models import Message, Channel
+from models import Message, Channel, User
+from taggable import Tag
 from utils import prefetch_refprops, key
-from django.core.paginator import Paginator, EmptyPage, InvalidPage
-import os, logging
+import os, logging, json
 from datetime import datetime, timedelta
 
 PAGE_SIZE=20
@@ -33,20 +33,42 @@ class ArchiveHandler(BaseHandler):
 
 class LogSweepHandler(BaseHandler):
     def get(self):
-        messages = Message.all().filter('timestamp < ', datetime.utcnow() - timedelta(weeks=4))
-        logging.info('Deleting: %s' % messages.count())
-        db.delete(messages)
-        channels = Channel.all()
-        for channel in channel:
+        messages = Message.all().filter('timestamp < ', datetime.utcnow() - timedelta(weeks=2))
+        self.response.out.write('Deleting: %s <br/>' % messages.count())
+        entries = messages.fetch(1000)
+        db.delete(entries)
+        for channel in Channel.all():
             messages = Message.all().filter('channel = ', channel)
-            if messages.get():
-                logging.info('Deleting channel: %s' % channel)
+            if not messages.get():
+                self.response.out.write('Deleting channel: %s <br/>' % channel.channel)
                 db.delete(channel)
+
+class TagHandler(BaseHandler):
+    def post(self):
+        payload = json.loads(self.request.body)
+        nickname = payload.get('nickname')
+        server = payload.get('server')
+        tags = payload.get('tags', [])
+        
+        user = User.find(server, nickname)
+        if user:
+            user.tags = ','.join(tags)
+            user.save()
+    
 
 class ChannelHandler(BaseHandler):
     
     def get(self, server, channel):
         channel = Channel.find(server, channel)
+        all_tags = Tag.popular_tags()
+        
+        # there's got to be a better way to do this
+        hide_tags = [Tag.get_by_name(tag) for tag in self.request.get_all('hide_tag')]
+        hide_keys = set()
+        for keys in [t.tagged for t in hide_tags]:
+            for key in keys:
+                hide_keys.add(str(key))
+        
         query = Message.all().filter('channel =', channel) \
                                         .order('-timestamp')
         cursor = self.request.GET.get('c')

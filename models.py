@@ -5,14 +5,25 @@ from urllib2 import unquote
 import logging
 
 from utils import parse_timestamp, get_or_create, prefetch_refprops
+import taggable
 import color
 
-class User(db.Model):
+class User(db.Model, taggable.Taggable):
+    
     server = db.StringProperty(required=True)
     nickname = db.StringProperty(required=True)
     created_at = db.DateTimeProperty(required=True, auto_now_add=True)
     last_seen_at = db.DateTimeProperty(required=False)
     color = db.ListProperty(int, required=True, default=[])
+    
+    def __init__(self, parent=None, key_name=None, app=None, **entity_values):
+        db.Model.__init__(self, parent, key_name, app, **entity_values)
+        taggable.Taggable.__init__(self)
+    
+    @staticmethod
+    def find(server, nickname):
+        key = db.Key.from_path(User.kind(), '%s/%s' % (nickname, server))
+        return User.get(key)
     
     def get_color(self):
         if not self.color:

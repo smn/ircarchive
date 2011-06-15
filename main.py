@@ -7,7 +7,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
 from xmpp import XmppHandler
-from archive import ArchiveHandler, ChannelHandler
+from archive import ArchiveHandler, ChannelHandler, TagHandler
 import logging
 
 logger = logging.getLogger()
@@ -16,6 +16,7 @@ logger.level = logging.DEBUG
 application = webapp.WSGIApplication([
         ('/_ah/xmpp/message/chat/', XmppHandler),
         ('/channel/(.+)/(.+)/', ChannelHandler),
+        ('/tag/user/', TagHandler),
         ('/', ArchiveHandler)
     ], debug=True)
 

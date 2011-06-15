@@ -7,7 +7,7 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from archive import LogSweepHandler
 
 application = webapp.WSGIApplication([
-        ('/log/sweeper/', LogSweepHandler),
+        ('/tasks/log/sweeper/', LogSweepHandler),
     ], debug=True)
 
 def main():
