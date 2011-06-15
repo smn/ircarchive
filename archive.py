@@ -4,7 +4,8 @@ from google.appengine.ext import webapp
 from google.appengine.api import memcache
 from models import Message, Channel, User
 from utils import prefetch_refprops, key
-import os, logging, json
+from django.utils import simplejson as json
+import os, logging
 from datetime import datetime, timedelta
 
 PAGE_SIZE=20
@@ -32,14 +33,12 @@ class ArchiveHandler(BaseHandler):
 
 class LogSweepHandler(BaseHandler):
     def get(self):
-        messages = Message.all().filter('timestamp < ', datetime.utcnow() - timedelta(weeks=2))
-        self.response.out.write('Deleting: %s <br/>' % messages.count())
+        messages = Message.all().filter('timestamp < ', datetime.utcnow() - timedelta(weeks=4))
         entries = messages.fetch(1000)
         db.delete(entries)
         for channel in Channel.all():
             messages = Message.all().filter('channel = ', channel)
             if not messages.get():
-                self.response.out.write('Deleting channel: %s <br/>' % channel.channel)
                 db.delete(channel)
 
 class BotFlaggingHandler(BaseHandler):
