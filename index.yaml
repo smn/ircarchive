@@ -13,10 +13,36 @@ indexes:
 - kind: Message
   properties:
   - name: channel
+  - name: tags
+
+- kind: Message
+  properties:
+  - name: channel
+  - name: tags
+  - name: tags
+  - name: tags
+  - name: timestamp
+    direction: desc
+
+- kind: Message
+  properties:
+  - name: channel
   - name: timestamp
 
 - kind: Message
   properties:
   - name: channel
+  - name: timestamp
+    direction: desc
+
+- kind: Message
+  properties:
+  - name: channel
+  - name: user
+
+- kind: Message
+  properties:
+  - name: channel
+  - name: user
   - name: timestamp
     direction: desc

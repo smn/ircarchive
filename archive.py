@@ -2,8 +2,7 @@ from google.appengine.ext import db
 from google.appengine.ext.webapp import template
 from google.appengine.ext import webapp
 from google.appengine.api import memcache
-from models import Message, Channel, User
-from taggable import Tag
+from models import Message, Channel, User, Tag
 from utils import prefetch_refprops, key
 import os, logging, json
 from datetime import datetime, timedelta
@@ -48,11 +47,10 @@ class TagHandler(BaseHandler):
         payload = json.loads(self.request.body)
         nickname = payload.get('nickname')
         server = payload.get('server')
-        tags = payload.get('tags', [])
-        
+        tags = Tag.get_or_create(*payload.get('tags', []))
         user = User.find(server, nickname)
         if user:
-            user.tags = ','.join(tags)
+            user.tags = [tag.key() for tag in tags]
             user.save()
     
 
@@ -60,17 +58,19 @@ class ChannelHandler(BaseHandler):
     
     def get(self, server, channel):
         channel = Channel.find(server, channel)
-        all_tags = Tag.popular_tags()
         
-        # there's got to be a better way to do this
-        hide_tags = [Tag.get_by_name(tag) for tag in self.request.get_all('hide_tag')]
-        hide_keys = set()
-        for keys in [t.tagged for t in hide_tags]:
-            for key in keys:
-                hide_keys.add(str(key))
+        all_tags = Tag.all()
+        hide_tag_names = self.request.get_all('hide_tag')
+        hide_tags = [tag for tag in all_tags if tag.name in hide_tag_names]
         
-        query = Message.all().filter('channel =', channel) \
-                                        .order('-timestamp')
+        query = Message.all().filter('channel =', channel)
+        if hide_tags:
+            for selected_tag in selected_tags:
+                query = query.filter('tags != ', selected_tag)
+        
+        query = query.order('-timestamp')
+        
+        # hide_keys = list(hide_keys)
         cursor = self.request.GET.get('c')
         if cursor:
             query.with_cursor(cursor)

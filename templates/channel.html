@@ -10,8 +10,8 @@
             {% for tag in all_tags %}
             <dl>
                 <dt>
-                    <input type="checkbox" name="hide_tag" value="{{tag.tag}}" id="tag_{{tag.tag}}">
-                    <label for="tag_{{tag.tag}}">{{tag.tag}}</label>
+                    <input type="checkbox" name="hide_tag" value="{{tag.name}}" id="tag_{{tag.name}}">
+                    <label for="tag_{{tag.name}}">{{tag.name}}</label>
                 </dt>
             </dl>
             {% endfor %}
@@ -26,56 +26,54 @@
         </tr>
         {% if messages %}
             {% for message in messages %}
-                {% if message.user.key not in hide_keys %}
-                    {# timestamp #}
-                    {% ifchanged %}
-                    <tr>
-                        <th colspan="3" class="date">{{ message.timestamp|date:"l, F jS" }}</th>
-                    </tr>
-                    {% endifchanged %}
-                
-                    {# the message #}
-                    {% ifequal message.message_type 'message' %}
-                    <tr class="{% cycle even,odd %}">
-                        <td class="timestamp" id="{{message.timestamp|date:"YmdHis"}}">
-                            {# display friendly time since value if the message was posted today #}
-                            {% if message.timestamp.date == today %}
-                                {{message.timestamp|timesince}} ago
-                        
-                            {# otherwise display the time posted, currently as UTC #}
-                            {% else %}
-                                {{message.timestamp|date:"H:i"}}
-                            {% endif %}
-                        </td>
-                        <td class="nickname" style="background-color: rgb({{message.user.get_color|join:","}})" title="Last seen on {{message.user.last_seen_at|date:"l, F jS \a\t H:i"}}, tagged with {{message.user.tags|join:", "}}">{{message.user.nickname}}</td>
-                        <td class="message">{{ message.message_content|escape|urlize }}</td>
-                    </tr>
-                    {% endifequal %}
-        
-                    {% ifequal message.message_type 'action'  %}
-                    <tr class="action">
-                        <td id="{{message.timestamp|date:"YmdHis"}}" colspan="3">
-                            <div>
-                                {{ message.message_content|escape|urlize }} at {{message.timestamp|date:"H:i"}}
-                            </div>
-                        </td>
-                    </tr>
-                    {% endifequal %}
+                {# timestamp #}
+                {% ifchanged %}
+                <tr>
+                    <th colspan="3" class="date">{{ message.timestamp|date:"l, F jS" }}</th>
+                </tr>
+                {% endifchanged %}
+            
+                {# the message #}
+                {% ifequal message.message_type 'message' %}
+                <tr class="{% cycle even,odd %}">
+                    <td class="timestamp" id="{{message.timestamp|date:"YmdHis"}}">
+                        {# display friendly time since value if the message was posted today #}
+                        {% if message.timestamp.date == today %}
+                            {{message.timestamp|timesince}} ago
+                    
+                        {# otherwise display the time posted, currently as UTC #}
+                        {% else %}
+                            {{message.timestamp|date:"H:i"}}
+                        {% endif %}
+                    </td>
+                    <td class="nickname" style="background-color: rgb({{message.user.get_color|join:","}})" title="Last seen on {{message.user.last_seen_at|date:"l, F jS \a\t H:i"}}, tagged with {{message.user.tags|join:", "}}">{{message.user.nickname}}</td>
+                    <td class="message">{{ message.message_content|escape|urlize }}</td>
+                </tr>
+                {% endifequal %}
+    
+                {% ifequal message.message_type 'action'  %}
+                <tr class="action">
+                    <td id="{{message.timestamp|date:"YmdHis"}}" colspan="3">
+                        <div>
+                            {{ message.message_content|escape|urlize }} at {{message.timestamp|date:"H:i"}}
+                        </div>
+                    </td>
+                </tr>
+                {% endifequal %}
 
-                    {% ifequal message.message_type 'system'  %}
-                    <tr class="system">
-                        <td id="{{message.timestamp|date:"YmdHis"}}">
-                            {% if message.timestamp.date == today %}
-                                {{message.timestamp|timesince}} ago
-                            {% else %}
-                                {{message.timestamp|date:"H:i"}}
-                            {% endif %}
-                        </td>
-                        <td></td>
-                        <td>{{ message.message_content|escape|urlize }}</td>
-                    </tr>
-                    {% endifequal %}
-                {% endif %}
+                {% ifequal message.message_type 'system'  %}
+                <tr class="system">
+                    <td id="{{message.timestamp|date:"YmdHis"}}">
+                        {% if message.timestamp.date == today %}
+                            {{message.timestamp|timesince}} ago
+                        {% else %}
+                            {{message.timestamp|date:"H:i"}}
+                        {% endif %}
+                    </td>
+                    <td></td>
+                    <td>{{ message.message_content|escape|urlize }}</td>
+                </tr>
+                {% endifequal %}
             {% endfor %}
             <tr>
                 <td colspan="3" id="oldest">

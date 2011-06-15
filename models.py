@@ -5,20 +5,25 @@ from urllib2 import unquote
 import logging
 
 from utils import parse_timestamp, get_or_create, prefetch_refprops
-import taggable
 import color
 
-class User(db.Model, taggable.Taggable):
+class Tag(db.Model):
+    name = db.StringProperty(required=True)
+    
+    @staticmethod
+    def get_or_create(*tags):
+        tag_names = set([tag.strip() for tag in tags])
+        return [get_or_create(Tag, name=name) for name in tag_names]
+    
+
+class User(db.Model):
     
     server = db.StringProperty(required=True)
     nickname = db.StringProperty(required=True)
     created_at = db.DateTimeProperty(required=True, auto_now_add=True)
     last_seen_at = db.DateTimeProperty(required=False)
     color = db.ListProperty(int, required=True, default=[])
-    
-    def __init__(self, parent=None, key_name=None, app=None, **entity_values):
-        db.Model.__init__(self, parent, key_name, app, **entity_values)
-        taggable.Taggable.__init__(self)
+    tags = db.ListProperty(db.Key, required=True, default=[])
     
     @staticmethod
     def find(server, nickname):
@@ -50,6 +55,7 @@ class Message(db.Model):
         "system", "action", "message"])
     message_content = db.TextProperty(required=True)
     json = db.TextProperty(required=True)
+    tags = db.ListProperty(db.Key, required=True, default=[])
     
     @staticmethod
     def log(json_data):
@@ -72,7 +78,7 @@ class Message(db.Model):
         # store the message
         msg = Message(user=user, channel=channel, message_type=message_type,
             message_content=message_content, json=json_data, 
-            timestamp=timestamp)
+            timestamp=timestamp,tags=user.tags)
         msg.put()
         return msg
         
