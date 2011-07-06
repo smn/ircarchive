@@ -30,7 +30,15 @@ class User(db.Model):
 class Channel(db.Model):
     channel = db.StringProperty(required=True)
     server = db.StringProperty(required=True)
+    username = db.StringProperty(required=False, default='')
+    password = db.StringProperty(required=False, default='')
     topic = db.TextProperty()
+    
+    def is_private(self):
+        return self.username and self.password
+    
+    def authenticate(self, username, password):
+        return username == self.username and password == self.password
     
     @staticmethod
     def find(server, channel):

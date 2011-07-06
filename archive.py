@@ -5,7 +5,7 @@ from google.appengine.api import memcache
 from models import Message, Channel, User
 from utils import prefetch_refprops, key
 from django.utils import simplejson as json
-import os, logging
+import os, logging, base64
 from datetime import datetime, timedelta
 
 PAGE_SIZE=20
@@ -56,6 +56,14 @@ class BotFlaggingHandler(BaseHandler):
             db.put(messages)
             
         
+class ClearHandler(BaseHandler):
+    def get(self):
+        # for i in range(10):
+        #     db.delete(Message.all().fetch(1000))
+        #     db.delete(User.all().fetch(1000))
+        #     db.delete(Channel.all().fetch(1000))
+        pass
+
 
 class BotHandler(BaseHandler):
     def post(self):
@@ -71,8 +79,23 @@ class BotHandler(BaseHandler):
 
 class ChannelHandler(BaseHandler):
     
+    def challenge(self, realm):
+        self.response.set_status(401, message='Authorization Required')
+        self.response.headers['WWW-Authenticate'] = 'Basic realm="%s"' % realm
+    
     def get(self, server, channel):
         channel = Channel.find(server, channel)
+        
+        if channel.is_private():
+            auth = self.request.headers.get('Authorization')
+            if auth:
+                auth_parts = auth.split(' ')
+                username, password = base64.b64decode(auth_parts[1]).split(':')
+                if not channel.authenticate(username, password):
+                    return self.challenge('Private IRC Channel %s' % channel.channel)
+            else:
+                return self.challenge('Private IRC Channel %s' % channel.channel)
+        
         hide_bots = self.request.GET.get('hide_bots', '1') == '1'
         
         query = Message.all().filter('channel =', channel)

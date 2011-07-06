@@ -4,4 +4,7 @@ cron:
       schedule: every 12 hours
     - description: bot flagger
       url: /tasks/bot/flagger/
-      schedule: every 12 hours
+      schedule: every 10 minutes
+    # - description: clear all
+    #   url: /tasks/clear/
+    #   schedule: every 1 hours
