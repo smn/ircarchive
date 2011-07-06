@@ -4,7 +4,14 @@
     <p>IRC channels being tracked by <a href="http://twitter.com/vumiapp">@vumiapp</a></p>
     <ul>
     {% for channel in channels %}
-        <li><a href="/channel/{{channel.server}}/{{ channel.channel|urlencode }}/">{{ channel.channel }}</a> on {{ channel.server }}</li>
+        <li>
+            {% if channel.is_private %}
+                <img src="/static/lock.png">
+            {% endif %}
+            <a href="/channel/{{channel.server}}/{{ channel.channel|urlencode }}/">
+                {{ channel.channel }}
+            </a> on {{ channel.server }}
+        </li>
     {% endfor %}
     </ul>
 {% endblock %}

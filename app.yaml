@@ -16,6 +16,9 @@ handlers:
 - url: /robots\.txt
   static_files: static/robots.txt
   upload: static/robots\.txt
+- url: /lock\.png
+  static_files: static/lock.png
+  upload: static/lock\.png
 - url: /tasks/.*
   script: tasks.py
   login: admin
