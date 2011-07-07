@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block body %}
+    <h1>{{channel.channel}} on {{channel.server}}</h1>
+    <a href="/channel/{{channel.server}}/{{channel.channel|urlencode}}/">&larr; back to the channel</a>
+    <h2>Password protect this channel log</h2>
+    <p>This will prevent Google from including it in search results and will 
+        prevent unauthorized access to the conversations that took place in 
+        this IRC channel. 
+    </p><p>
+        It does not change anything with the authentication of
+        the <strong>{{channel.channel}}</strong> channel on <strong>{{channel.server}}</strong> itself.
+    </p>
+    <form action="" method="post">
+        <div>
+            <label for="username">Username</label><input type="text" name="username" value="{{channel.username}}" id="username">
+        </div>
+        <div>
+            <label for="password">Password</label><input type="password" name="password" value="{{channel.password}}" id="password">
+        </div>
+        <div>
+            <input type="submit" name="submit" value="Save" id="submit">
+        </div>
+    </form>
+{% endblock %}

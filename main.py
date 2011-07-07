@@ -7,17 +7,18 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
 from xmpp import XmppHandler
-from archive import ArchiveHandler, ChannelHandler, BotHandler
+from archive import ArchiveHandler, ChannelHandler, BotHandler, EditChannelHandler
 import logging
 
 logger = logging.getLogger()
 logger.level = logging.DEBUG
 
 application = webapp.WSGIApplication([
-        ('/_ah/xmpp/message/chat/', XmppHandler),
-        ('/channel/(.+)/(.+)/', ChannelHandler),
-        ('/bot/', BotHandler),
-        ('/', ArchiveHandler)
+        (r'/_ah/xmpp/message/chat/$', XmppHandler),
+        (r'/channel/(.+)/(.+)/edit/$', EditChannelHandler),
+        (r'/channel/(.+)/(.+)/$', ChannelHandler),
+        (r'/bot/', BotHandler),
+        (r'/', ArchiveHandler)
     ], debug=True)
 
 def main():

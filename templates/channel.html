@@ -1,19 +1,22 @@
 {% extends "base.html" %}
 {% block body %}
+    {% if notification %}
+        <div class="notification">
+            {{notification}}
+        </div>
+    {% endif %}
     <h1>{{channel.channel}} on {{channel.server}}</h1>
-    <form action="" method="get" accept-charset="utf-8">
-        <a href="/">&larr; back to all channels</a>
-        &middot;
-        <a href="#oldest">&darr; Oldest messages at the bottom</a>
-        &middot;
-        {% if hide_bots %}
-            <input type="hidden" name="hide_bots" value="0" id="hide_bots">
-            <input type="submit" name="" value="Show bots" id="">
-        {% else %}
-            <input type="hidden" name="hide_bots" value="1" id="hide_bots">
-            <input type="submit" name="" value="Hide bots" id="">
-        {% endif %}
-    </form>
+    <a href="/">&larr; back to all channels</a>
+    &middot;
+    <a href="#oldest">&darr; Oldest messages at the bottom</a>
+    &middot;
+    <a href="/channel/{{channel.server}}/{{channel.channel|urlencode}}/edit/">Edit channel properties</a>
+    &middot;
+    {% if hide_bots %}
+        <a href="?hide_bots=0">Show bots</a>
+    {% else %}
+        <a href="?hide_bots=1">Hide bots</a>
+    {% endif %}
     <table>
         <tr>
             <th>Time</th>

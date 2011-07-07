@@ -5,6 +5,7 @@ from google.appengine.api import memcache
 from models import Message, Channel, User
 from utils import prefetch_refprops, key
 from django.utils import simplejson as json
+from urllib2 import unquote, quote
 import os, logging, base64
 from datetime import datetime, timedelta
 
@@ -19,6 +20,29 @@ class BaseHandler(webapp.RequestHandler):
     
     def render_to_response(self, template_file, context):
         return self.response.out.write(self.render_to_string(template_file, context))
+    
+    def redirect_to(self, location):
+        self.response.set_status(301)
+        self.response.headers['Location'] = location
+    
+    def challenge(self, realm):
+        self.response.set_status(401, message='Authorization Required')
+        self.response.headers['WWW-Authenticate'] = 'Basic realm="%s"' % realm
+
+    def authenticate(self, realm, callback):
+        auth = self.request.headers.get('Authorization')
+        if auth:
+            auth_parts = auth.split(' ')
+            username, password = base64.b64decode(auth_parts[1]).split(':')
+            if not callback(username, password):
+                self.challenge(realm)
+                return False
+            return True
+        else:
+            self.challenge(realm)
+            return False
+
+
 
 class ArchiveHandler(BaseHandler):
     def get(self):
@@ -79,25 +103,15 @@ class BotHandler(BaseHandler):
 
 class ChannelHandler(BaseHandler):
     
-    def challenge(self, realm):
-        self.response.set_status(401, message='Authorization Required')
-        self.response.headers['WWW-Authenticate'] = 'Basic realm="%s"' % realm
-    
     def get(self, server, channel):
         channel = Channel.find(server, channel)
         
         if channel.is_private():
-            auth = self.request.headers.get('Authorization')
-            if auth:
-                auth_parts = auth.split(' ')
-                username, password = base64.b64decode(auth_parts[1]).split(':')
-                if not channel.authenticate(username, password):
-                    return self.challenge('Private IRC Channel %s' % channel.channel)
-            else:
-                return self.challenge('Private IRC Channel %s' % channel.channel)
+            if not self.authenticate('Private IRC channel %s' % channel.channel, 
+                                        channel.authenticate):
+                return
         
         hide_bots = self.request.GET.get('hide_bots', '1') == '1'
-        
         query = Message.all().filter('channel =', channel)
         
         if hide_bots:
@@ -117,5 +131,23 @@ class ChannelHandler(BaseHandler):
             memcache.set(next, cursor)
         # optimization
         prefetch_refprops(messages, Message.user)
+        notification = self.request.GET.get('msg')
         self.render_to_response('templates/channel.html', locals())
-        
+
+class EditChannelHandler(BaseHandler):
+    
+    def get(self, server, channel):
+        channel = Channel.find(server, channel)
+        if channel.is_private():
+            if not self.authenticate('Private IRC chanenl %s' % channel.channel, 
+                                        channel.authenticate):
+                return
+        self.render_to_response('templates/edit_channel.html', locals())
+    
+    def post(self, server, channel):
+        channel = Channel.find(server, channel)
+        channel.username = self.request.POST.get('username')
+        channel.password = self.request.POST.get('password')
+        channel.save()
+        msg = 'Channel properties have been updated'
+        self.redirect_to('/channel/%s/%s/?msg=%s' % (channel.server, quote(channel.channel), msg))
