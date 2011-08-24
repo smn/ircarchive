@@ -139,7 +139,7 @@ class EditChannelHandler(BaseHandler):
     def get(self, server, channel):
         channel = Channel.find(server, channel)
         if channel.is_private():
-            if not self.authenticate('Private IRC chanenl %s' % channel.channel, 
+            if not self.authenticate('Private IRC channel %s' % channel.channel, 
                                         channel.authenticate):
                 return
         self.render_to_response('templates/edit_channel.html', locals())
