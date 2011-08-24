@@ -1,3 +1,4 @@
 *.pyc
 bulkloader-*
 .DS_Store
+pip-log.txt

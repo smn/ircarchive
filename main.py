@@ -9,12 +9,15 @@ from google.appengine.ext.webapp import template
 from xmpp import XmppHandler
 from archive import ArchiveHandler, ChannelHandler, BotHandler, EditChannelHandler
 import logging
+import backbone
 
 logger = logging.getLogger()
 logger.level = logging.DEBUG
 
 application = webapp.WSGIApplication([
+        # accept messages via XMPP
         (r'/_ah/xmpp/message/chat/$', XmppHandler),
+        (r'/index\.json$', backbone.Index),
         (r'/channel/(.+)/(.+)/edit/$', EditChannelHandler),
         (r'/channel/(.+)/(.+)/$', ChannelHandler),
         (r'/bot/', BotHandler),

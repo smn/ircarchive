@@ -40,8 +40,18 @@ class Channel(db.Model):
     def authenticate(self, username, password):
         return username == self.username and password == self.password
     
-    @staticmethod
-    def find(server, channel):
+    def to_dict(self):
+        return dict([(p, getattr(self, p)) 
+                for p in self.properties()])
+    
+    @classmethod
+    def list(cls, prefix="#"):
+        return [channel for channel in Channel.all().order('channel') 
+                        if (prefix and channel.channel.startswith(prefix))]
+        
+    
+    @classmethod
+    def find(cls, server, channel):
         key = db.Key.from_path(Channel.kind(), '%s/%s' % (unquote(channel), server))
         return Channel.get(key)
     
