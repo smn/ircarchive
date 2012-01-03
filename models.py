@@ -102,7 +102,7 @@ class Message(db.Model):
         message_content = msg['content']
         message_type = command_map.get(irc_command)
 
-        if message_type:
+        if message_type and channel:
             timestamp = datetime.utcnow()
 
             user = get_or_create(User, server=server, nickname=nickname)
