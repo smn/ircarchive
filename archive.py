@@ -53,7 +53,7 @@ class ArchiveHandler(BaseHandler):
     def post(self):
         msg = Message.log_common_message_format(self.request.body)
         self.response.set_status(201)
-        self.response.out.write(msg.key())
+        self.response.out.write('')
 
 class LogSweepHandler(BaseHandler):
     def get(self):
