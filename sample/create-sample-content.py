@@ -3,13 +3,20 @@ from datetime import datetime, timedelta
 
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 
+
 json = """{
- "nickname": "%(nickname)s",
- "server": "irc.freenode.net",
- "channel": "#vumi",
- "message_type": "message",
- "message_content": "testing app engine at %(date)s",
- "timestamp": "%(date)s"
+    "to_addr": "%(nickname1)s!irc.freenode.net",
+    "from_addr": "%(nickname2)s!irc.freenode.net",
+    "content": "testing app engine at %(date)s",
+    "transport_name": "irc_transport",
+    "transport_type": "irc",
+    "transport_metadata": {
+        "transport_nickname": "bot",
+        "irc_server": "irc.freenode.net:6667",
+        "irc_channel": "#vumi",
+        "irc_command": "PRIVMSG",
+        "irc_addressed_to_transport": false
+    }
 }""".replace('\n', '')
 
 if len(sys.argv) == 1:
@@ -23,6 +30,7 @@ for i in range(0, limit):
     timestamp = datetime.utcnow() - timedelta(**{interval: i})
     payload = json % {
         'date': timestamp.strftime(DATE_FORMAT),
-        'nickname': random.sample(['foo', 'bar', 'boo', 'far', 'baz'], 1).pop()
+        'nickname1': random.sample(['foo', 'bar', 'boo', 'far', 'baz'], 1).pop(),
+        'nickname2': random.sample(['foo', 'bar', 'boo', 'far', 'baz'], 1).pop(),
     }
     print "curl -X POST http://localhost:8080/ -d '%s'" % payload
