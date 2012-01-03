@@ -57,7 +57,7 @@ class ArchiveHandler(BaseHandler):
 
 class LogSweepHandler(BaseHandler):
     def get(self):
-        messages = Message.all().filter('timestamp < ', datetime.utcnow() - timedelta(weeks=4))
+        messages = Message.all().filter('timestamp < ', datetime.utcnow() - timedelta(weeks=52))
         entries = messages.fetch(1000)
         db.delete(entries)
         for channel in Channel.all():
@@ -77,6 +77,16 @@ class BotFlaggingHandler(BaseHandler):
             logging.info(messages)
             for message in messages:
                 message.user_is_human = False
+            db.put(messages)
+
+        humans = User.all().filter('is_human = ', True)
+        logging.info(humans)
+        for human in humans:
+            messages = Message.all().filter('user = ', human)\
+                            .filter('user_is_human = ', False).fetch(1000)
+            logging.info(messages)
+            for message in messages:
+                message.user_is_human = True
             db.put(messages)
 
 

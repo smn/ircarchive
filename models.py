@@ -86,9 +86,7 @@ class Message(db.Model):
     def log_common_message_format(json_data):
         logging.info("Received JSON: %s" % json_data)
         msg = json.loads(json_data)
-        user = msg['from_addr']
-
-        nickname = user.partition('!')[0]
+        nickname = msg['from_addr']
         transport_metadata = msg['transport_metadata']
 
         server_and_port = transport_metadata.get('irc_server')
