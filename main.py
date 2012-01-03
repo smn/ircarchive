@@ -17,7 +17,8 @@ logger.level = logging.DEBUG
 application = webapp.WSGIApplication([
         # accept messages via XMPP
         (r'/_ah/xmpp/message/chat/$', XmppHandler),
-        (r'/index\.json$', backbone.Index),
+        (r'/index\.json$', backbone.IndexHandler),
+        (r'/channel\.json$', backbone.ChannelHandler),
         (r'/channel/(.+)/(.+)/edit/$', EditChannelHandler),
         (r'/channel/(.+)/(.+)/$', ChannelHandler),
         (r'/bot/', BotHandler),

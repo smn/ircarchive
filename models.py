@@ -46,9 +46,10 @@ class Channel(db.Model):
     
     @classmethod
     def list(cls, prefix="#"):
-        return [channel for channel in Channel.all().order('channel') 
-                        if (prefix and channel.channel.startswith(prefix))]
-        
+        channels = [channel for channel in Channel.all().order('channel')]
+        if prefix:
+            channels = filter(lambda c: c.channel.startswith(prefix), channels)
+        return channels
     
     @classmethod
     def find(cls, server, channel):
