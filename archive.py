@@ -13,18 +13,18 @@ PAGE_SIZE=20
 DATE_FORMAT = '%Y%m%d%H%M%S'
 
 class BaseHandler(webapp.RequestHandler):
-    
+
     def render_to_string(self, template_file, context):
         path = os.path.join(os.path.dirname(__file__), template_file)
         return template.render(path, context)
-    
+
     def render_to_response(self, template_file, context):
         return self.response.out.write(self.render_to_string(template_file, context))
-    
+
     def redirect_to(self, location):
         self.response.set_status(301)
         self.response.headers['Location'] = location
-    
+
     def challenge(self, realm):
         self.response.set_status(401, message='Authorization Required')
         self.response.headers['WWW-Authenticate'] = 'Basic realm="%s"' % realm
@@ -46,18 +46,18 @@ class BaseHandler(webapp.RequestHandler):
 
 class ArchiveHandler(BaseHandler):
     def get(self):
-        channels = [channel for channel in Channel.all().order('channel') 
+        channels = [channel for channel in Channel.all().order('channel')
                         if channel.channel.startswith('#')]
         self.render_to_response('templates/index.html', locals())
-    
+
     def post(self):
-        msg = Message.log(self.request.body)
+        msg = Message.log_common_message_format(self.request.body)
         self.response.set_status(201)
         self.response.out.write(msg.key())
 
 class LogSweepHandler(BaseHandler):
     def get(self):
-        messages = Message.all().filter('timestamp < ', datetime.utcnow() - timedelta(weeks=4))
+        messages = Message.all().filter('timestamp < ', datetime.utcnow() - timedelta(weeks=52))
         entries = messages.fetch(1000)
         db.delete(entries)
         for channel in Channel.all():
@@ -78,8 +78,18 @@ class BotFlaggingHandler(BaseHandler):
             for message in messages:
                 message.user_is_human = False
             db.put(messages)
-            
-        
+
+        humans = User.all().filter('is_human = ', True)
+        logging.info(humans)
+        for human in humans:
+            messages = Message.all().filter('user = ', human)\
+                            .filter('user_is_human = ', False).fetch(1000)
+            logging.info(messages)
+            for message in messages:
+                message.user_is_human = True
+            db.put(messages)
+
+
 class ClearHandler(BaseHandler):
     def get(self):
         # for i in range(10):
@@ -99,31 +109,31 @@ class BotHandler(BaseHandler):
         if user:
             user.is_human = bool(is_human)
             user.save()
-    
+
 
 class ChannelHandler(BaseHandler):
-    
+
     def get(self, server, channel):
         channel = Channel.find(server, channel)
-        
+
         if channel.is_private():
-            if not self.authenticate('Private IRC channel %s' % channel.channel, 
+            if not self.authenticate('Private IRC channel %s' % channel.channel,
                                         channel.authenticate):
                 return
-        
+
         hide_bots = self.request.GET.get('hide_bots', '1') == '1'
         query = Message.all().filter('channel =', channel)
-        
+
         if hide_bots:
             query = query.filter('user_is_human = ', True)
-        
+
         quer = query.order('-timestamp')
-        
+
         cursor = self.request.GET.get('c')
         if cursor:
             query.with_cursor(cursor)
             previous = memcache.get(cursor) or ''
-        
+
         today = datetime.utcnow().date()
         messages = query.fetch(PAGE_SIZE)
         next = query.cursor()
@@ -135,15 +145,15 @@ class ChannelHandler(BaseHandler):
         self.render_to_response('templates/channel.html', locals())
 
 class EditChannelHandler(BaseHandler):
-    
+
     def get(self, server, channel):
         channel = Channel.find(server, channel)
         if channel.is_private():
-            if not self.authenticate('Private IRC chanenl %s' % channel.channel, 
+            if not self.authenticate('Private IRC chanenl %s' % channel.channel,
                                         channel.authenticate):
                 return
         self.render_to_response('templates/edit_channel.html', locals())
-    
+
     def post(self, server, channel):
         channel = Channel.find(server, channel)
         channel.username = self.request.POST.get('username')
