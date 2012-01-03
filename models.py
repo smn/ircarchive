@@ -109,6 +109,9 @@ class Message(db.Model):
             user.last_seen_at = datetime.utcnow()
             user.put()
 
+            if message_type == 'action':
+                message_content = '%s %s' % (nickname, message_content)
+
             channel = get_or_create(Channel, server=server, channel=channel)
             msg = Message(user=user, channel=channel, message_type=message_type,
                 message_content=message_content, json=json_data,
