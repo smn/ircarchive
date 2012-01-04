@@ -54,7 +54,7 @@
                 <tr class="action">
                     <td id="{{message.timestamp|date:"YmdHis"}}" colspan="3">
                         <div>
-                            {{ message.message_content|escape|urlize }} at {{message.timestamp|date:"H:i"}}
+                            {{ message.user.nickname }} {{ message.message_content|escape|urlize }} at {{message.timestamp|date:"H:i"}}
                         </div>
                     </td>
                 </tr>
