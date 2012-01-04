@@ -77,21 +77,17 @@ class BotFlaggingHandler(BaseHandler):
     a bot then go back into history and mark their messages as such"""
     def get(self):
         bots = User.all().filter('is_human = ', False)
-        logging.info(bots)
         for bot in bots:
             messages = Message.all().filter('user = ',bot)\
                             .filter('user_is_human = ', True).fetch(1000)
-            logging.info(messages)
             for message in messages:
                 message.user_is_human = False
             db.put(messages)
 
         humans = User.all().filter('is_human = ', True)
-        logging.info(humans)
         for human in humans:
             messages = Message.all().filter('user = ', human)\
                             .filter('user_is_human = ', False).fetch(1000)
-            logging.info(messages)
             for message in messages:
                 message.user_is_human = True
             db.put(messages)
