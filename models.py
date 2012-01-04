@@ -88,6 +88,7 @@ class Message(db.Model):
         msg = json.loads(json_data)
         nickname = msg['from_addr']
         transport_metadata = msg['transport_metadata']
+        irc_metadata = transport_metadata['irc']
 
         server_and_port = transport_metadata.get('irc_server')
         server = server_and_port.partition(':')[0]
