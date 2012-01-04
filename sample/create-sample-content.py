@@ -10,12 +10,14 @@ json = """{
     "content": "testing app engine at %(date)s",
     "transport_name": "irc_transport",
     "transport_type": "irc",
-    "transport_metadata": {
-        "transport_nickname": "bot",
-        "irc_server": "irc.freenode.net:6667",
-        "irc_channel": "#vumi",
-        "irc_command": "PRIVMSG",
-        "irc_addressed_to_transport": false
+    "helper_metadata": {
+        "irc": {
+            "transport_nickname": "bot",
+            "addressed_to_transport": false,
+            "irc_server": "irc.freenode.net:6667",
+            "irc_channel": "#vumi",
+            "irc_command": "PRIVMSG"
+        }
     }
 }""".replace('\n', '')
 

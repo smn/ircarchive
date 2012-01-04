@@ -87,18 +87,18 @@ class Message(db.Model):
         logging.info("Received JSON: %s" % json_data)
         msg = json.loads(json_data)
         nickname = msg['from_addr']
-        transport_metadata = msg['transport_metadata']
+        irc_metadata = msg['helper_metadata'].get('irc', {})
 
-        server_and_port = transport_metadata.get('irc_server')
+        server_and_port = irc_metadata.get('irc_server')
         server = server_and_port.partition(':')[0]
-        channel = transport_metadata.get('irc_channel')
+        channel = irc_metadata.get('irc_channel')
 
         command_map = {
             'PRIVMSG': 'message',
             'ACTION': 'action'
         }
 
-        irc_command = transport_metadata.get('irc_command', 'PRIVMSG')
+        irc_command = irc_metadata.get('irc_command', 'PRIVMSG')
         message_content = msg['content']
         message_type = command_map.get(irc_command)
 
