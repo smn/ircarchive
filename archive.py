@@ -56,7 +56,8 @@ class ArchiveHandler(BaseHandler):
             self.response.set_status(201)
             self.response.headers['Content-Length'] = 0
             self.response.out.write('')
-        except ValueError, KeyError:
+        except (ValueError, KeyError, AttributeError), e:
+            logging.error(e)
             self.response.set_status(400)
             self.response.headers['Content-Length'] = 0
             self.response.out.write('')
