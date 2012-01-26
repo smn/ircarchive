@@ -1,5 +1,5 @@
 from django.utils import simplejson as json
-from google.appengine.ext import db
+from google.appengine.ext import db, search
 from datetime import datetime
 from urllib2 import unquote
 import logging
@@ -46,7 +46,7 @@ class Channel(db.Model):
         return Channel.get(key)
 
 
-class Message(db.Model):
+class Message(search.SearchableModel):
     user = db.ReferenceProperty(User)
     user_is_human = db.BooleanProperty(required=True, default=True)
     channel = db.ReferenceProperty(Channel)
