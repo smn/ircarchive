@@ -125,7 +125,7 @@ class ChannelHandler(BaseHandler):
                 return
 
         hide_bots = self.request.GET.get('hide_bots', '1') == '1'
-	search_str = self.request.GET.get('q','')
+        search_str = self.request.GET.get('q','')
         query = Message.all().search(search_str).filter('channel =', channel)
 
         if hide_bots:
