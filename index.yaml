@@ -22,3 +22,11 @@ indexes:
   - name: user_is_human
   - name: timestamp
     direction: desc
+
+- kind: Message
+  properties:
+  - name: __searchable_text_index
+  - name: channel
+  - name: user_is_human
+  - name: timestamp
+    direction: desc
