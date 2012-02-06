@@ -4,7 +4,7 @@ from datetime import datetime
 from urllib2 import unquote
 import logging
 
-from utils import parse_timestamp, get_or_create, prefetch_refprops
+from utils import parse_timestamp, parse_vumi_timestamp, get_or_create, prefetch_refprops
 import color
 
 class User(db.Model):
@@ -103,7 +103,7 @@ class Message(search.SearchableModel):
         message_type = command_map.get(irc_command)
 
         if message_type and channel:
-            timestamp = datetime.utcnow()
+            timestamp = parse_vumi_timestamp(msg['timestamp'])
 
             user = get_or_create(User, server=server, nickname=nickname)
             user.last_seen_at = datetime.utcnow()

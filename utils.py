@@ -18,6 +18,10 @@ def parse_timestamp(timestamp):
     else:
         return datetime.strptime(timestamp, FORMAT)
 
+def parse_vumi_timestamp(timestamp)
+    VUMI_DATE_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
+    return datetime.strptime(timestamp, VUMI_DATE_FORMAT)
+
 
 # http://blog.notdot.net/2010/01/ReferenceProperty-prefetching-in-App-Engine
 def prefetch_refprops(entities, *props):
