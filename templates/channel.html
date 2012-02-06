@@ -83,12 +83,12 @@
                 <td colspan="3" id="oldest">
                     {% if next %}
                         <div class="next">
-                            <a href="?c={{ next }}">Older &rarr;</a>
+                            <a href="?c={{ next }}&q={{search_str}}">Older &rarr;</a>
                         </div>
                     {% endif %}
                     {% if cursor %}
                         <div class="previous">
-                            <a href="?c={{ previous }}">&larr; Newer</a>
+                            <a href="?c={{ previous }}&q={{search_str}}">&larr; Newer</a>
                         </div>
                     {% endif %}
                 </td>
