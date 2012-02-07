@@ -23,11 +23,11 @@ class BaseHandler(webapp.RequestHandler):
 
     def redirect_to(self, location):
         self.response.set_status(301)
-        self.response.headers['Location'] = location
+        self.response.headers['Location'] = location.encode('utf8')
 
     def challenge(self, realm):
         self.response.set_status(401, message='Authorization Required')
-        self.response.headers['WWW-Authenticate'] = 'Basic realm="%s"' % realm
+        self.response.headers['WWW-Authenticate'] = ('Basic realm="%s"' % realm).encode('utf8')
 
     def authenticate(self, realm, callback):
         auth = self.request.headers.get('Authorization')
@@ -54,12 +54,12 @@ class ArchiveHandler(BaseHandler):
         try:
             msg = Message.log_common_message_format(self.request.body)
             self.response.set_status(201)
-            self.response.headers['Content-Length'] = 0
+            self.response.headers['Content-Length'] = '0'
             self.response.out.write('')
         except (ValueError, KeyError, AttributeError), e:
             logging.error(e)
             self.response.set_status(400)
-            self.response.headers['Content-Length'] = 0
+            self.response.headers['Content-Length'] = '0'
             self.response.out.write('')
 
 class LogSweepHandler(BaseHandler):
