@@ -12,7 +12,7 @@ indexes:
 
 - kind: Message
   properties:
-  - name: __searchable_text_index
+  - name: __searchable_text_index_message_content
   - name: channel
   - name: user_is_human
   - name: timestamp
