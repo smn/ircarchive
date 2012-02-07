@@ -52,11 +52,15 @@ class Message(search.SearchableModel):
     channel = db.ReferenceProperty(Channel)
     timestamp = db.DateTimeProperty(required=True)
     message_type = db.StringProperty(required=True, choices=[
-        "system", "action", "message"])
-    message_content = db.TextProperty(required=True)
+        "system", "action", "message"], indexed=False)
+    message_content = db.TextProperty(required=True, indexed=False)
 
-    json = db.TextProperty(required=True)
+    json = db.TextProperty(required=True, indexed=False)
 
+    @classmethod
+    def SearchableProperties(cls):
+        return [['message_content']]
+  
     @staticmethod
     def log(json_data):
         logging.info('Received JSON: %s' % json_data)

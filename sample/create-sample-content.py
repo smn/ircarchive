@@ -1,7 +1,7 @@
 import sys, random
 from datetime import datetime, timedelta
 
-DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
+DATE_FORMAT = '%Y-%m-%d %H:%M:%S.%f'
 
 
 json = """{
@@ -10,6 +10,7 @@ json = """{
     "content": "testing app engine at %(date)s",
     "transport_name": "irc_transport",
     "transport_type": "irc",
+    "timestamp": "%(date)s",
     "helper_metadata": {
         "irc": {
             "transport_nickname": "bot",
