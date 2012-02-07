@@ -1,10 +1,10 @@
 application: ircarchive
 version: 1
-runtime: python
+runtime: python27
+threadsafe: true
 api_version: 1
 
 builtins:
-- datastore_admin: on
 - remote_api: on
 
 handlers:
@@ -20,10 +20,10 @@ handlers:
   static_files: static/lock.png
   upload: static/lock\.png
 - url: /tasks/.*
-  script: tasks.py
+  script: tasks.application
   login: admin
 - url: /.*
-  script: main.py
+  script: main.application
 
 inbound_services:
 - xmpp_message

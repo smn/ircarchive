@@ -18,11 +18,5 @@ application = webapp.WSGIApplication([
         (r'/channel/(.+)/(.+)/edit/$', EditChannelHandler),
         (r'/channel/(.+)/(.+)/$', ChannelHandler),
         (r'/bot/', BotHandler),
-        (r'/', ArchiveHandler)
+        (r'/', ArchiveHandler),
     ], debug=True)
-
-def main():
-    run_wsgi_app(application)
-
-if __name__ == "__main__":
-    main()
