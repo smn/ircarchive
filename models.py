@@ -1,11 +1,15 @@
-from django.utils import simplejson as json
-from google.appengine.ext import db, search
-from datetime import datetime
-from urllib2 import unquote
 import logging
 
-from utils import parse_timestamp, parse_vumi_timestamp, get_or_create, prefetch_refprops
+from datetime import datetime
+from urllib2 import unquote
+
+from django.utils import simplejson as json
+
+from google.appengine.ext import db, search
+
+from utils import parse_timestamp, parse_vumi_timestamp, get_or_create
 import color
+
 
 class User(db.Model):
 
@@ -27,6 +31,7 @@ class User(db.Model):
             self.put()
         return self.color
 
+
 class Channel(db.Model):
     channel = db.StringProperty(required=True)
     server = db.StringProperty(required=True)
@@ -42,7 +47,8 @@ class Channel(db.Model):
 
     @staticmethod
     def find(server, channel):
-        key = db.Key.from_path(Channel.kind(), '%s/%s' % (unquote(channel), server))
+        key = db.Key.from_path(Channel.kind(), '%s/%s' % (unquote(channel),
+            server))
         return Channel.get(key)
 
 
@@ -60,7 +66,7 @@ class Message(search.SearchableModel):
     @classmethod
     def SearchableProperties(cls):
         return [['message_content']]
-  
+
     @staticmethod
     def log(json_data):
         logging.info('Received JSON: %s' % json_data)
@@ -82,7 +88,7 @@ class Message(search.SearchableModel):
         # store the message
         msg = Message(user=user, channel=channel, message_type=message_type,
             message_content=message_content, json=json_data,
-            timestamp=timestamp, user_is_human = user.is_human)
+            timestamp=timestamp, user_is_human=user.is_human)
         msg.put()
         return msg
 
@@ -114,10 +120,10 @@ class Message(search.SearchableModel):
             user.put()
 
             channel = get_or_create(Channel, server=server, channel=channel)
-            msg = Message(user=user, channel=channel, message_type=message_type,
-                message_content=message_content, json=json_data,
-                timestamp=timestamp, user_is_human=user.is_human)
+            msg = Message(user=user, channel=channel,
+                message_type=message_type, message_content=message_content,
+                json=json_data, timestamp=timestamp,
+                user_is_human=user.is_human)
             msg.put()
             return msg
         return ''
-

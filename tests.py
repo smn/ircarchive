@@ -1,11 +1,10 @@
 from datetime import datetime
 from unittest import TestCase
 
-from google.appengine.api import memcache
-from google.appengine.ext import db
 from google.appengine.ext import testbed
 
 from models import Message
+
 
 class MessageModelTestCase(TestCase):
 
@@ -44,4 +43,4 @@ class MessageModelTestCase(TestCase):
 
     def test_parse_timestamp(self):
         msg = Message.log_common_message_format(self.sample_msg)
-        self.assertEqual(msg.timestamp, datetime(2012,1,3,11,29,57))
+        self.assertEqual(msg.timestamp, datetime(2012, 1, 3, 11, 29, 57))

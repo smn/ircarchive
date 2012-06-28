@@ -1,12 +1,15 @@
 from google.appengine.ext import db
 from datetime import datetime
 
+
 def key(*args):
     return db.Key.from_path(*args).id_or_name()
+
 
 def get_or_create(model, **kwargs):
     key_name = key(model.kind(), '/'.join(kwargs.values()))
     return model.get_or_insert(key_name, **kwargs)
+
 
 def parse_timestamp(timestamp):
     FORMAT = '%Y-%m-%dT%H:%M:%S'
@@ -18,9 +21,11 @@ def parse_timestamp(timestamp):
     else:
         return datetime.strptime(timestamp, FORMAT)
 
+
 def parse_vumi_timestamp(timestamp):
     VUMI_DATE_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
     return datetime.strptime(timestamp, VUMI_DATE_FORMAT)
+
 
 # http://blog.notdot.net/2010/01/ReferenceProperty-prefetching-in-App-Engine
 def prefetch_refprops(entities, *props):
@@ -30,4 +35,3 @@ def prefetch_refprops(entities, *props):
     for (entity, prop), ref_key in zip(fields, ref_keys):
         prop.__set__(entity, ref_entities[ref_key])
     return entities
-

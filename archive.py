@@ -1,16 +1,24 @@
+import os
+import logging
+import base64
+
+from urllib2 import quote
+from datetime import datetime, timedelta
+
 from google.appengine.ext import db
 from google.appengine.ext.webapp import template
 from google.appengine.ext import webapp
 from google.appengine.api import memcache
-from models import Message, Channel, User
-from utils import prefetch_refprops, key
-from django.utils import simplejson as json
-from urllib2 import unquote, quote
-import os, logging, base64
-from datetime import datetime, timedelta
 
-PAGE_SIZE=20
+from django.utils import simplejson as json
+
+from models import Message, Channel, User
+from utils import prefetch_refprops
+
+
+PAGE_SIZE = 20
 DATE_FORMAT = '%Y%m%d%H%M%S'
+
 
 class BaseHandler(webapp.RequestHandler):
 
@@ -19,7 +27,8 @@ class BaseHandler(webapp.RequestHandler):
         return template.render(path, context)
 
     def render_to_response(self, template_file, context):
-        return self.response.out.write(self.render_to_string(template_file, context))
+        return self.response.out.write(self.render_to_string(template_file,
+            context))
 
     def redirect_to(self, location):
         self.response.set_status(301)
@@ -27,7 +36,8 @@ class BaseHandler(webapp.RequestHandler):
 
     def challenge(self, realm):
         self.response.set_status(401, message='Authorization Required')
-        self.response.headers['WWW-Authenticate'] = ('Basic realm="%s"' % realm).encode('utf8')
+        self.response.headers['WWW-Authenticate'] = (
+            'Basic realm="%s"' % realm).encode('utf8')
 
     def authenticate(self, realm, callback):
         auth = self.request.headers.get('Authorization')
@@ -43,16 +53,13 @@ class BaseHandler(webapp.RequestHandler):
             return False
 
 
-
 class ArchiveHandler(BaseHandler):
     def get(self):
-        channels = [channel for channel in Channel.all().order('channel')
-                        if channel.channel.startswith('#')]
         self.render_to_response('templates/index.html', locals())
 
     def post(self):
         try:
-            msg = Message.log_common_message_format(self.request.body)
+            Message.log_common_message_format(self.request.body)
             self.response.set_status(201)
             self.response.headers['Content-Length'] = '0'
             self.response.out.write('')
@@ -62,9 +69,11 @@ class ArchiveHandler(BaseHandler):
             self.response.headers['Content-Length'] = '0'
             self.response.out.write('')
 
+
 class LogSweepHandler(BaseHandler):
     def get(self):
-        messages = Message.all().filter('timestamp < ', datetime.utcnow() - timedelta(weeks=52))
+        messages = Message.all().filter('timestamp < ',
+            datetime.utcnow() - timedelta(weeks=52))
         entries = messages.fetch(1000)
         db.delete(entries)
         for channel in Channel.all():
@@ -72,14 +81,15 @@ class LogSweepHandler(BaseHandler):
             if not messages.get():
                 db.delete(channel)
 
+
 class BotFlaggingHandler(BaseHandler):
     """If a user's been active on ircarchive but is now flagged as being
     a bot then go back into history and mark their messages as such"""
     def get(self):
         bots = User.all().filter('is_human = ', False)
         for bot in bots:
-            messages = Message.all().filter('user = ',bot)\
-                            .filter('user_is_human = ', True).fetch(1000)
+            messages = Message.all().filter('user = ', bot).filter(
+                'user_is_human = ', True).fetch(1000)
             for message in messages:
                 message.user_is_human = False
             db.put(messages)
@@ -120,18 +130,19 @@ class ChannelHandler(BaseHandler):
         channel = Channel.find(server, channel)
 
         if channel.is_private():
-            if not self.authenticate('Private IRC channel %s' % channel.channel,
-                                        channel.authenticate):
+            if not self.authenticate('Private IRC channel %s' %
+                channel.channel, channel.authenticate):
                 return
 
         hide_bots = self.request.GET.get('hide_bots', '1') == '1'
-        search_str = self.request.GET.get('q','')
-        query = Message.all().search(search_str, properties = ['message_content']).filter('channel =', channel)
+        search_str = self.request.GET.get('q', '')
+        query = Message.all().search(search_str,
+            properties=['message_content']).filter('channel =', channel)
 
         if hide_bots:
             query = query.filter('user_is_human = ', True)
 
-        quer = query.order('-timestamp')
+        query = query.order('-timestamp')
 
         cursor = self.request.GET.get('c')
         if cursor:
@@ -146,15 +157,24 @@ class ChannelHandler(BaseHandler):
         # optimization
         prefetch_refprops(messages, Message.user)
         notification = self.request.GET.get('msg')
-        self.render_to_response('templates/channel.html', locals())
+        self.render_to_response('templates/channel.html', {
+            'hide_bots': hide_bots,
+            'channel': channel,
+            'messages': messages,
+            'notification': notification,
+            'today': today,
+            'next': next,
+            'previous': previous,
+        })
+
 
 class EditChannelHandler(BaseHandler):
 
     def get(self, server, channel):
         channel = Channel.find(server, channel)
         if channel.is_private():
-            if not self.authenticate('Private IRC chanenl %s' % channel.channel,
-                                        channel.authenticate):
+            if not self.authenticate('Private IRC chanenl %s' %
+                channel.channel, channel.authenticate):
                 return
         self.render_to_response('templates/edit_channel.html', locals())
 
@@ -164,4 +184,5 @@ class EditChannelHandler(BaseHandler):
         channel.password = self.request.POST.get('password')
         channel.save()
         msg = 'Channel properties have been updated'
-        self.redirect_to('/channel/%s/%s/?msg=%s' % (channel.server, quote(channel.channel), msg))
+        self.redirect_to('/channel/%s/%s/?msg=%s' % (channel.server,
+            quote(channel.channel), msg))
