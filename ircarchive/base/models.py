@@ -7,8 +7,9 @@ from django.utils import simplejson as json
 
 from google.appengine.ext import db, search
 
-from utils import parse_timestamp, parse_vumi_timestamp, get_or_create
-import color
+from ircarchive.base.utils import (parse_timestamp, parse_vumi_timestamp,
+    get_or_create)
+from ircarchive.base import color
 
 
 class User(db.Model):

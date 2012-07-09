@@ -1,5 +1,6 @@
-from django.conf.urls.defaults import patterns, include, url
+from django.conf.urls.defaults import patterns, url
+from ircarchive.base import views
 
 urlpatterns = patterns('',
-    url(r'/', )
+    url(r'^$', views.index, name='index'),
 )
