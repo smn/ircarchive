@@ -55,7 +55,11 @@ class BaseHandler(webapp.RequestHandler):
 
 class ArchiveHandler(BaseHandler):
     def get(self):
-        self.render_to_response('templates/index.html', locals())
+        channels = [channel for channel in Channel.all().order('channel')
+                        if channel.channel.startswith('#')]
+        self.render_to_response('templates/index.html', {
+            'channels': channels,
+            })
 
     def post(self):
         try:
@@ -148,6 +152,8 @@ class ChannelHandler(BaseHandler):
         if cursor:
             query.with_cursor(cursor)
             previous = memcache.get(cursor) or ''
+        else:
+            previous = ''
 
         today = datetime.utcnow().date()
         messages = query.fetch(PAGE_SIZE)

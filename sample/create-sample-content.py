@@ -1,4 +1,5 @@
-import sys, random
+import sys
+import random
 from datetime import datetime, timedelta
 
 DATE_FORMAT = '%Y-%m-%d %H:%M:%S.%f'
@@ -23,7 +24,8 @@ json = """{
 }""".replace('\n', '')
 
 if len(sys.argv) == 1:
-    print 'Usage: python create-sample-content.py <records> [seconds|minutes|hours|days]'
+    print "Usage: python create-sample-content.py <records> " \
+            "[seconds|minutes|hours|days]"
     sys.exit(1)
 
 limit = int(sys.argv[1]) if len(sys.argv) > 1 else 100
@@ -33,7 +35,9 @@ for i in range(0, limit):
     timestamp = datetime.utcnow() - timedelta(**{interval: i})
     payload = json % {
         'date': timestamp.strftime(DATE_FORMAT),
-        'nickname1': random.sample(['foo', 'bar', 'boo', 'far', 'baz'], 1).pop(),
-        'nickname2': random.sample(['foo', 'bar', 'boo', 'far', 'baz'], 1).pop(),
+        'nickname1': random.sample(
+            ['foo', 'bar', 'boo', 'far', 'baz'], 1).pop(),
+        'nickname2': random.sample(
+            ['foo', 'bar', 'boo', 'far', 'baz'], 1).pop(),
     }
     print "curl -X POST http://localhost:8080/ -d '%s'" % payload
